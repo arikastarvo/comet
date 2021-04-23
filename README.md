@@ -84,10 +84,6 @@ High level overview of technologies and vocabulary used.
 **Comet** - *java* - it's the main workhorse of the package (read inputs, parse data, execute queries and output the results). Multiple Comet instances can run in same host.   
 **Monitor** - this is a configuration collection of Comet that can be run within working instance Comet. Multiple monitors can be loaded and run within one Comet instance.
 
-### tech
-* noop runtime
-* segmented ouput modules
-
 ## Building and usage
 
 ```bash
