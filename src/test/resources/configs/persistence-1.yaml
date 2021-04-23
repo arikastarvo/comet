@@ -1,0 +1,6 @@
+input:
+  - type: noop
+    name: noop
+    finite: true
+ 
+persistence: eventsWindow

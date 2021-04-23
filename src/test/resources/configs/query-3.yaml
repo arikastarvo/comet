@@ -1,0 +1,8 @@
+input:
+  - type: noop
+    name: noop
+    finite: true
+ 
+query:
+  name: myquery
+  query: select * from events

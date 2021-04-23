@@ -1,0 +1,3 @@
+cmd,description,severity
+mimikatz,this is mimikatz,5
+scan,regular scanner,3

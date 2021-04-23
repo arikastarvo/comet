@@ -1,0 +1,8 @@
+input:
+  - type: noop
+    name: noop
+    finite: true
+ 
+persistence:
+  persistence: eventsWindow
+  persistence-interval: 10

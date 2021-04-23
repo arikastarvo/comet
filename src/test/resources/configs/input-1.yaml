@@ -1,0 +1,29 @@
+input:
+  - type: noop
+    name: noop
+    finite: true
+    
+  - type: stdin
+    name: stdin
+    
+  - type: csv
+    name: csvinput
+    file: csvinput.csv
+  
+  - type: csv
+    name: csvinput2
+    content: |
+      field1,field2
+      row-1-field-1,row-1-field-2
+    
+  - type: list
+    name: listinput
+    data:
+      - first
+      - second
+   
+  - type: file
+    name: file_1
+    file: input-1.yaml
+
+query: select * from events

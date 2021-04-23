@@ -184,7 +184,9 @@ public class FileInput extends Input<FileInput> implements RepeatableInput, Refe
 			
 			String contentLine = reader.readLine();
 			Map<String, Object> parsed = new HashMap<String, Object>();
-			parsed.putAll(filenameMetadataBuffer.get(reader.hashCode()));
+			if (filenameMetadataBuffer.containsKey(reader.hashCode())) {
+				parsed.putAll(filenameMetadataBuffer.get(reader.hashCode()));
+			}
 			monitorRuntime.parse(contentLine, parsed, true, this.id);
 			
 			if(parsed.containsKey("logts_timestamp") && parsed.get("logts_timestamp") instanceof Long) {

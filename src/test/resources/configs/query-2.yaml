@@ -1,0 +1,9 @@
+input:
+  - type: noop
+    name: noop
+    finite: true
+ 
+query:
+  - select * from events
+  - select * from logevents
+  - file:query.epl
