@@ -86,7 +86,6 @@ High level overview of technologies and vocabulary used.
 ## Roadmap
 
 **IF** I will ever get to this, then ideas are ...
-* Fix those unit tests that I broke and did not push upstream (and then add some more)  
 * Finish and polish Redis Streams and Kafka input/output connectors that are almost ready  
 * Some more modularization to:  
   * create separate api packagage that can be utilized to build new io connectors
