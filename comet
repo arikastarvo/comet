@@ -1,0 +1,3 @@
+#!/bin/bash
+
+source src/bin/comet

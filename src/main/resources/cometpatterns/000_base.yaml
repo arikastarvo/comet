@@ -1,0 +1,20 @@
+patterns:
+  # match ANY line of data
+  - name: events
+    order: 1
+    keepfield: true
+    pattern: ^(?<data>.*)(\n)?$
+    fields:
+      srcip: string
+      srcport: int
+      dstip: string
+      dstport: int
+      
+  
+  # match EVERY line with a prefixed metadata (timestamp, source host and syslog pid)
+  - name: logevents
+    parent: events
+    order: 2
+    keepfield: true
+    #pattern: ^%{TIMESTAMP_ISO8601:logts}\t%{HOST:host}\t(?<pid>[^\t]*)\t(?<data>.*)$
+    pattern: ^(?<logts>[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\S+)\t(?<host>[^\t]+)\t(?<pid>[^\t]*)\t(?<data>.*)$

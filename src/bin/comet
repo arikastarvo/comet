@@ -1,0 +1,137 @@
+#!/bin/bash
+
+scriptpath=$(realpath "$0")
+binpath=$(dirname "$scriptpath")
+apppath=$(dirname "$binpath")
+libpath="${apppath}/lib"
+confpath="${apppath}/conf"
+propfile="application.properties"
+
+## this is for overriding some paths in local dev env
+if [ -f "${binpath}/comet.env.sh" ]; then
+    source "${binpath}/comet.env.sh"
+fi
+
+if [ -n "${XMX}" ]; then
+    XMX="-Xmx${XMX}"
+else
+    XMX="-Xmx64M"
+fi
+
+## check if propfile exists, exit otherwise 
+if [ ! -f "${apppath}/${propfile}" ]; then
+    echo "no ${propfile} file, exiting"
+    exit 1
+fi
+
+VER=$(cat "${apppath}/${propfile}" | grep "version=" | cut -d "=" -f 2 | tr $'\r' '\n')
+
+## check if necessary jar file even exists
+if [ ! -f "${libpath}/comet-${VER}-all.jar" ]; then
+    echo "no comet jar file found, exiting"
+    exit 1
+fi
+
+BASEPATH="${PWD}"
+cd "$apppath"
+
+log() {
+    LINE=$(date -Iseconds)$'\t'"${MONITOR:-comet}@"$(hostname -f)$'\t'$(whoami)$'\t'"$$"$'\t'"$1"
+    if [[ -n "$2" && "$2" != "-" ]]; then
+        echo "$LINE" >> "${LOGPATH}/${2}.log"
+    else
+        echo "$LINE"
+    fi
+}
+
+function finish {
+    pkill -P $$
+}
+
+DC=$(hostname | cut -d "-" -f 1)
+
+## args that have to be handled on bash level also, so we do some magic here
+declare -a ARGS
+ARGS+=("${@}")
+
+
+## add previous PWD as --basepath
+ARGS+=("--basepath")
+ARGS+=("${BASEPATH}")
+
+DAEMONIZE=false
+SECRETS=""
+HEAPDUMP=false
+MONITOR=""
+HELP=false
+while test $# -gt 0
+do
+    case "$1" in
+        --daemonize) DAEMONIZE=true
+            ;;
+        --heapdump) HEAPDUMP=true
+            ;;
+        --name|-n)
+            shift
+            MONITOR="$1"
+            ;;
+        --xmx)
+            shift
+            XMX="-Xmx$1"
+            ;;
+        --secrets)
+            shift
+            SECRETS="$1"
+            ;;
+        -v) HELP=true
+            ;;
+        -h) HELP=true
+            ;;
+        --help) HELP=true
+            ;;
+    esac
+    shift
+done
+
+##
+if [ -n "${SECRETS}" ] ; then
+    ARGS+=("--secrets" "$SECRETS")
+elif [ -n "$COMET_SECRETS_FILE" ]; then
+    ARGS+=("--secrets" "$COMET_SECRETS_FILE")
+    SECRETS="${COMET_SECRETS_FILE}"
+elif [ -f "${confpath}/secrets.yaml" ] && [ -r "${confpath}/secrets.yaml" ]; then
+    ARGS+=("--secrets" "${confpath}/secrets.yaml")
+    SECRETS="${confpath}/secrets.yaml" 
+fi
+
+#if [ -t 0 ]; then
+#    echo "have stdin"
+#fi 
+
+COMMON_ARGS=()
+
+if [[ "${JMX}" == "true" ]]; then 
+    COMMON_ARGS+=("-Dcom.sun.management.jmxremote.port=9999")
+    COMMON_ARGS+=("-Dcom.sun.management.jmxremote.authenticate=false")
+    COMMON_ARGS+=("-Dcom.sun.management.jmxremote.ssl=false")
+fi
+
+COMMON_ARGS+=("--add-opens")
+COMMON_ARGS+=("java.base/java.util.regex=ALL-UNNAMED")
+
+COMMON_ARGS+=("-Djava.util.logging.config.file=commons-logging.properties")
+COMMON_ARGS+=("-Dlog4j.shutdownHookEnabled=false")
+ 
+
+if ${DAEMONIZE} && ! ${HELP} ; then
+    nohup java ${XMX} "${COMMON_ARGS[@]}" -jar "${libpath}/comet-${VER}-all.jar" "${ARGS[@]}" > /dev/null 2>&1 &
+else
+    trap finish EXIT 2>/dev/null
+    if [ -t 1 ] && [[ $INTERACTIVE != "false" ]] ; then
+        ARGS+=("--interactive")
+    fi
+    # for local testing 
+    #java -Dcom.sun.management.jmxremote.port=9999 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false ${XMX} "${COMMON_ARGS[@]}" -jar "${libpath}/comet-${VER}-all.jar" "${ARGS[@]}" </dev/stdin
+    
+    java ${XMX} "${COMMON_ARGS[@]}" -jar "${libpath}/comet-${VER}-all.jar" "${ARGS[@]}" </dev/stdin
+fi

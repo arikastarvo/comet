@@ -1,0 +1,21 @@
+# custom patterns
+
+LD .*
+JSON .*
+JSON_NESTED .*
+CSV .*
+CSV_NESTED .*
+NOTCOMMA [^,]*?
+URLARGS %{NOTSPACE}
+URLARGS_NESTED %{NOTSPACE}
+
+IPNULL (?:%{IP}|.*)
+IPNULLNOTCOMMA (?:%{IP}|[^,]*)
+
+HOSTNULL (?:%{HOST}|.*)
+HOSTNULLNOTCOMMA (?:%{HOST}|[^,]*)
+
+ESCAPEDQS ([\\]?(?:(?>"(?>\\.|[^"]+)+"|""|(?>'(?>\\.|[^']+)+')|''|(?>`(?>\\.|[^`]+)+`)|``))|[^,]*)
+ESCAPEDQSORNOTCOMMA (?:%{ESCAPEDQS}|%{NOTCOMMA})
+
+WINEVT %{INT}\t%{JSON:data}
