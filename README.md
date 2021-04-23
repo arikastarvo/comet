@@ -83,6 +83,19 @@ High level overview of technologies and vocabulary used.
 
 **Comet** - *java* - it's the main workhorse of the package (read inputs, parse data, execute queries and output the results). Multiple Comet instances can run in same host.   
 **Monitor** - this is a configuration collection of Comet that can be run within working instance Comet. Multiple monitors can be loaded and run within one Comet instance.
+## Roadmap
+
+**IF** I will ever get to this, then ideas are ...
+* Fix those unit tests that I broke and did not push upstream (and then add some more)  
+* Finish and polish Redis Streams and Kafka input/output connectors that are almost ready  
+* Some more modularization to:  
+  * create separate api packagage that can be utilized to build new io connectors
+  * break existing io connectors into separate projects/packages  
+* finalize comet and CEP engine runtime separation so that other CEP engines can be used (query part can be swapped with something else)
+  * include Siddhi support
+  * include Flink support
+* introduce Spring framwork to create http api to manage jobs lifecycles
+
 
 ## Building and usage
 
