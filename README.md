@@ -1,6 +1,6 @@
 # COMET aka COMplex EvenT processor
 
-NB! This software was a product of a thesis project!  
+NB! This tool is a product of a thesis project!  
 
 Comet is for processing textual data line-by-line as a stream of events and providing Esper EPL query functionality on that data. Mostly oriented for processing streaming logs. Sample use-cases:  
 * filter out certain log entries (and do alerting?)
@@ -84,11 +84,6 @@ High level overview of technologies and vocabulary used.
 **Comet** - *java* - it's the main workhorse of the package (read inputs, parse data, execute queries and output the results). Multiple Comet instances can run in same host.   
 **Monitor** - this is a configuration collection of Comet that can be run within working instance Comet. Multiple monitors can be loaded and run within one Comet instance.
 
-## Overview
-
-### functional
-* 
-
 ### tech
 * noop runtime
 * segmented ouput modules
@@ -97,11 +92,11 @@ High level overview of technologies and vocabulary used.
 
 ```bash
 ## build and use locally
-./gradlew clean shadowJar               # build 
+gradle clean shadowJar               # build 
 ./comet                                 # run Comet
 
 ## build final artifact and use it
-./gradlew clean distTar                 # build 
+gradle clean distTar                 # build 
                                         # unpack and navigate to target dir
 find build/distributions/ -name "*.tgz" -exec tar -C build/distributions/ -xf {} \; && cd $(find build/distributions/ -type d -name "comet-*")
 ./bin/comet                             # run Comet
