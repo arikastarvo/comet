@@ -4,16 +4,22 @@ import org.apache.logging.log4j.LogManager;
 
 import com.github.arikastarvo.comet.input.FiniteInput;
 import com.github.arikastarvo.comet.input.Input;
-
+import com.github.arikastarvo.comet.input.InputConnector;
 /**
  * Does nothing and keeps running
  * 
  * Can be used if some other input type dies and is terminated for some reason but application should not exit.
  * 
- * @author tarvoa
+ * @author tarvo
  *
  */
+@InputConnector(
+	name = NoopInput.NAME,
+	configuration = NoopInputConfiguration.class
+)
 public class NoopInput extends Input<NoopInput> implements FiniteInput {
+
+	public static final String NAME = "noop";
 
 	NoopInputConfiguration ic;
 	

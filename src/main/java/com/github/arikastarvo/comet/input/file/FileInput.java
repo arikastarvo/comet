@@ -33,11 +33,18 @@ import com.github.arikastarvo.comet.InputEventReceiver;
 import com.github.arikastarvo.comet.input.FiniteInput;
 import com.github.arikastarvo.comet.input.Input;
 import com.github.arikastarvo.comet.input.InputConfiguration;
+import com.github.arikastarvo.comet.input.InputConnector;
 import com.github.arikastarvo.comet.input.ReferenceInput;
 import com.github.arikastarvo.comet.input.RepeatableInput;
 import com.github.arikastarvo.comet.reference.ReferenceReloadCallback;
 
+@InputConnector(
+	name = FileInput.NAME,
+	configuration = FileInputConfiguration.class
+)
 public class FileInput extends Input<FileInput> implements RepeatableInput, ReferenceInput, FiniteInput {
+
+	public static final String NAME = "file";
 
 	FileInputConfiguration ic;
 	ScheduledExecutorService executorService;

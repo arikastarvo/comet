@@ -32,7 +32,7 @@ public class FileInputConfiguration extends InputConfiguration<FileInputConfigur
 	
 	@Override
 	public String getInputType() {
-		return "file";
+		return FileInput.NAME;
 	}
 	
 	@Override

@@ -9,10 +9,17 @@ import com.github.arikastarvo.comet.InputEventReceiver;
 import com.github.arikastarvo.comet.MonitorRuntimeConfiguration;
 import com.github.arikastarvo.comet.input.FiniteInput;
 import com.github.arikastarvo.comet.input.Input;
+import com.github.arikastarvo.comet.input.InputConnector;
 import com.github.arikastarvo.comet.input.ReferenceInput;
 import com.github.arikastarvo.comet.reference.ReferenceReloadCallback;
 
+@InputConnector(
+	name = StaticListInput.NAME,
+	configuration = StaticListInputConfiguration.class
+)
 public class StaticListInput extends Input<StaticListInput> implements FiniteInput, ReferenceInput {
+
+	public static final String NAME = "list";
 
 	private String type = "string";
 	

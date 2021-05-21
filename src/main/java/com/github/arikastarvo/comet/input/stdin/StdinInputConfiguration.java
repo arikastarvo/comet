@@ -39,7 +39,7 @@ public class StdinInputConfiguration extends InputConfiguration<StdinInputConfig
 
 	@Override
 	public String getInputType() {
-		return "stdin";
+		return StdinInput.NAME;
 	}
 
 	@Override

@@ -9,8 +9,15 @@ import org.apache.logging.log4j.LogManager;
 
 import com.github.arikastarvo.comet.CometApplication;
 import com.github.arikastarvo.comet.input.Input;
+import com.github.arikastarvo.comet.input.InputConnector;
 
+@InputConnector(
+	name = StdinInput.NAME,
+	configuration = StdinInputConfiguration.class
+)
 public class StdinInput extends Input<StdinInput> {
+
+	public static final String NAME = "stdin";
 
 	StdinInputConfiguration ic;
 

@@ -19,12 +19,19 @@ import com.github.arikastarvo.comet.MonitorRuntimeConfiguration;
 import com.github.arikastarvo.comet.input.FiniteInput;
 import com.github.arikastarvo.comet.input.Input;
 import com.github.arikastarvo.comet.input.InputConfiguration;
+import com.github.arikastarvo.comet.input.InputConnector;
 import com.github.arikastarvo.comet.input.ReferenceInput;
 import com.github.arikastarvo.comet.reference.ReferenceReloadCallback;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 
+@InputConnector(
+	name = CSVInput.NAME,
+	configuration = CSVInputConfiguration.class
+)
 public class CSVInput extends Input<CSVInput> implements FiniteInput, ReferenceInput {
+
+	public static final String NAME = "csv";
 
 	CSVInputConfiguration ic;
 	
@@ -188,8 +195,7 @@ public class CSVInput extends Input<CSVInput> implements FiniteInput, ReferenceI
 
 	@Override
 	public String getDescription() {
-		// TODO Auto-generated method stub
-		return null;
+		return "CSV Input";
 	}
 	
 	@Override

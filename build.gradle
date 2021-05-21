@@ -96,6 +96,9 @@ dependencies {
 	/** fancy and hip replacement for plain old regex **/
 	//implementation 'com.nflabs:grok:0.1.0'
 	implementation 'io.krakens:java-grok:0.1.9'
+
+	// for annotation scanning
+	implementation 'io.github.classgraph:classgraph:4.8.105'
 	
 	/**
 	 * esper

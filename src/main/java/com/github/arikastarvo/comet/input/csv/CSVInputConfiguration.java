@@ -32,7 +32,7 @@ public class CSVInputConfiguration extends InputConfiguration<CSVInputConfigurat
 
 	@Override
 	public String getInputType() {
-		return "csv";
+		return CSVInput.NAME;
 	}
 
 	@Override

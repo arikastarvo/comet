@@ -32,7 +32,7 @@ public class SyslogInputConfiguration extends InputConfiguration<SyslogInputConf
 
 	@Override
 	public String getInputType() {
-		return "noop";
+		return SyslogInput.NAME;
 	}
 
 	@Override

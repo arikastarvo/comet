@@ -54,7 +54,7 @@ public class StaticListInputConfiguration extends InputConfiguration<StaticListI
 
 	@Override
 	public String getInputType() {
-		return "list";
+		return StaticListInput.NAME;
 	}
 
 	@Override

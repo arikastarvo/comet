@@ -39,7 +39,7 @@ public class NoopInputConfiguration extends InputConfiguration<NoopInputConfigur
 
 	@Override
 	public String getInputType() {
-		return "noop";
+		return NoopInput.NAME;
 	}
 
 	@Override
