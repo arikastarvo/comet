@@ -1,4 +1,4 @@
-package com.github.arikastarvo.comet.input;
+package com.github.arikastarvo.comet.output;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,10 +7,10 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface InputConnector {
+public @interface OutputConnector {
 
     public String name();
 
     @SuppressWarnings("rawtypes")
-    public Class<? extends InputConfiguration> configuration();
+    public Class<? extends OutputConfiguration> configuration();
 }

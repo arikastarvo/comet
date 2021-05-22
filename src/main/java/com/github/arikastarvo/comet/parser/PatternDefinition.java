@@ -10,7 +10,7 @@ import java.util.Map;
  * TODO
  * 
  * 
- * @author tarvoa
+ * @author tarvo
  *
  */
 public class PatternDefinition extends HashMap<String, Object> {

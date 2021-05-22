@@ -59,10 +59,10 @@ import com.github.arikastarvo.comet.MonitorRuntimeConfiguration;
 import com.github.arikastarvo.comet.input.FiniteInput;
 import com.github.arikastarvo.comet.input.Input;
 import com.github.arikastarvo.comet.input.file.FileInput;
-import com.github.arikastarvo.comet.output.FileOutput;
-import com.github.arikastarvo.comet.output.FileOutputConfiguration;
-import com.github.arikastarvo.comet.output.StdoutOutput;
-import com.github.arikastarvo.comet.output.StdoutOutputConfiguration;
+import com.github.arikastarvo.comet.output.file.FileOutput;
+import com.github.arikastarvo.comet.output.file.FileOutputConfiguration;
+import com.github.arikastarvo.comet.output.stdout.StdoutOutput;
+import com.github.arikastarvo.comet.output.stdout.StdoutOutputConfiguration;
 import com.github.arikastarvo.comet.parser.Parser;
 import com.github.arikastarvo.comet.persistence.PersistenceManager;
 import com.github.arikastarvo.comet.utils.DNSUtil;
@@ -94,7 +94,9 @@ public class MonitorRuntimeEsperImpl extends MonitorRuntime implements InputEven
 			log.error("failed to create persistence manager, continuing without one. error: {}", e.getMessage());
 			log.debug("failed to create persistence manager, continuing without one. error: {}", e.getMessage(), e);
 		}
-		
+
+		// initialize outputs
+		configuration.getListeners().values().forEach( listener -> listener.getOutput().init(configuration));
 		// initialize inputs (here we load last preconfigured event types)
 		configuration.getInputs().values().forEach( input -> input.init(configuration));
 		

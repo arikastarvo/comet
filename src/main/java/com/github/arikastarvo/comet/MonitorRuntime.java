@@ -34,10 +34,10 @@ import com.github.arikastarvo.comet.input.noop.NoopInput;
 import com.github.arikastarvo.comet.input.noop.NoopInputConfiguration;
 import com.github.arikastarvo.comet.input.stdin.StdinInput;
 import com.github.arikastarvo.comet.input.stdin.StdinInputConfiguration;
-import com.github.arikastarvo.comet.output.FileOutput;
-import com.github.arikastarvo.comet.output.FileOutputConfiguration;
-import com.github.arikastarvo.comet.output.StdoutOutput;
-import com.github.arikastarvo.comet.output.StdoutOutputConfiguration;
+import com.github.arikastarvo.comet.output.file.FileOutput;
+import com.github.arikastarvo.comet.output.file.FileOutputConfiguration;
+import com.github.arikastarvo.comet.output.stdout.StdoutOutput;
+import com.github.arikastarvo.comet.output.stdout.StdoutOutputConfiguration;
 import com.github.arikastarvo.comet.parser.Parser;
 import com.github.arikastarvo.comet.persistence.PersistenceManager;
 

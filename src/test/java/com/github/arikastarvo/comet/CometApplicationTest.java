@@ -11,7 +11,7 @@ import com.github.arikastarvo.comet.MonitorRuntime;
 import com.github.arikastarvo.comet.MonitorRuntimeConfiguration;
 import com.github.arikastarvo.comet.input.file.FileInput;
 import com.github.arikastarvo.comet.input.file.FileInputConfiguration;
-import com.github.arikastarvo.comet.output.NoopOutput;
+import com.github.arikastarvo.comet.output.noop.NoopOutput;
 import com.github.arikastarvo.comet.parser.Parser;
 import com.github.arikastarvo.comet.runtime.MonitorRuntimeEsperImpl;
 

@@ -29,11 +29,12 @@ import com.github.arikastarvo.comet.input.Input;
 import com.github.arikastarvo.comet.input.InputConfiguration;
 import com.github.arikastarvo.comet.input.ReferenceInput;
 import com.github.arikastarvo.comet.input.URICapableInputConfiguration;
-import com.github.arikastarvo.comet.output.FileOutput;
-import com.github.arikastarvo.comet.output.FileOutputConfiguration;
-import com.github.arikastarvo.comet.output.NoopOutput;
+import com.github.arikastarvo.comet.output.file.FileOutput;
+import com.github.arikastarvo.comet.output.file.FileOutputConfiguration;
+import com.github.arikastarvo.comet.output.noop.NoopOutput;
+import com.github.arikastarvo.comet.output.stdout.StdoutOutputConfiguration;
 import com.github.arikastarvo.comet.output.Output;
-import com.github.arikastarvo.comet.output.StdoutOutputConfiguration;
+import com.github.arikastarvo.comet.output.OutputConfiguration;
 import com.github.arikastarvo.comet.reference.Reference;
 import com.github.arikastarvo.comet.reference.ReferenceReloadCallback;
 import com.github.arikastarvo.comet.reference.SQLiteReference;
@@ -1144,10 +1145,10 @@ public class CometConfigurationYaml {
 	////////////////////////////////////////
 	
 	static class OutputConfigurationContainer {
-		Output output;
+		OutputConfiguration outputConfiguration;
 		Map<String, Object> extra;
-		OutputConfigurationContainer(Output output, Map<String, Object> extra) {
-			this.output = output;
+		OutputConfigurationContainer(OutputConfiguration outputConfiguration, Map<String, Object> extra) {
+			this.outputConfiguration = outputConfiguration;
 			this.extra = extra;
 		}
 	}
@@ -1196,50 +1197,79 @@ public class CometConfigurationYaml {
 		
 		return parseOutputConfigurations(outputDefinitionList);
 	}
-	
-	private static List<OutputConfigurationContainer> parseOutputConfigurations(List<Map<String, Object>> outputList) {
-		List<OutputConfigurationContainer> parsedOutputs = new ArrayList<OutputConfigurationContainer>();
-		
-			
-		for(Map<String, Object> outConf : outputList) {
 
-			if (outConf.containsKey("name") && conf.getListener((String)outConf.get("name")) != null) {
-				log.debug("reusing output {}", outConf.get("name"));
-				parsedOutputs.add(new OutputConfigurationContainer(conf.getListener((String)outConf.get("name")).getOutput(), outConf));
-				continue;
-			}
-			if(outConf.containsKey("type")) {
-				try {
-					if(outConf.get("type").equals("file")) {
-						FileOutputConfiguration oc = parseFileConfiguration(outConf);
-						parsedOutputs.add(new OutputConfigurationContainer(new FileOutput(oc), outConf));
-					} else if(outConf.get("type").equals("noop")) {
-						parsedOutputs.add(new OutputConfigurationContainer(new NoopOutput(), outConf));
-					} else {
-						throw new IllegalArgumentException("invalid output type specified");
-					}
-				} catch (IllegalArgumentException e) {
-					log.error("Invalid configuration for output with type {}. Cause: {}", outConf.get("type"), e.getMessage());
-					log.debug("Invalid configuration for output with type {}. Cause: {}", outConf.get("type"), e.getMessage(), e);
-				} catch (Exception e) {
-					log.error("Could not register ouput with type {}. Cause: {}", outConf.get("type"), e.getMessage());
-					log.debug("Could not register ouput with type {}. Cause: {}", outConf.get("type"), e.getMessage(), e);
-				}
-			}
-		}
+
+	/***
+	 * parse normalized output definition by creating outputconf object depending on output type
+	 *
+	 * @param outputDefinition
+	 * @param <T>
+	 * @return
+	 * @throws Exception
+	 */
+	private static <T extends OutputConfiguration<T>> OutputConfiguration<T> parseOutputMapDefinition(Map<String, Object> outputDefinition) throws Exception {
 		
-		return parsedOutputs;
+		Map<String, Class<T>> outputTypes = new HashMap<String, Class<T>>();
+
+		OutputConfiguration.getOutputConfigurationClasses().forEach( (Class confClass) -> {
+			
+			try {
+				OutputConfiguration<T> obj = (OutputConfiguration<T>)confClass.getConstructor(MonitorRuntimeConfiguration.class).newInstance(conf);
+				outputTypes.put(obj.getOutputType(), confClass);
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+				log.error("err : {}", e.getMessage(), e);
+			}
+		});
+		
+		OutputConfiguration<T> outputConf;
+		if (outputDefinition != null && outputDefinition.containsKey("type") && outputTypes.containsKey(outputDefinition.get("type"))) {
+			Class<T> outputConfClass = outputTypes.get(outputDefinition.get("type"));
+			outputConf = (OutputConfiguration<T>)(outputConfClass.getConstructor(MonitorRuntimeConfiguration.class).newInstance(conf));
+			outputConf.parseMapOutputDefinition(outputDefinition);
+		} else {
+			throw new Exception("unknown input type: " + outputDefinition.get("type"));
+		}
+		return outputConf;
 	}
 
+
+	/***
+	 * parse normalized output configurations to list of OutputConfigurationContainers
+	 *
+	 * @param inputDefinitions
+	 * @param <T>
+	 * @return
+	 */
+	private static <T extends OutputConfiguration<T>> List<OutputConfigurationContainer> parseOutputConfigurations(List<Map<String, Object>> outputDefinitions) {
+		List<OutputConfigurationContainer> outputConfigurationContainers = new ArrayList<OutputConfigurationContainer>();
+		for(Map<String, Object> outputDefinition : outputDefinitions) {
+			try {
+				OutputConfiguration<T> outputConfiguration = parseOutputMapDefinition(outputDefinition);
+				outputConfigurationContainers.add(new OutputConfigurationContainer(outputConfiguration, outputDefinition));
+			} catch(Exception e) {
+				log.error("output conf parsing failed", e);
+			}
+		}
+		return outputConfigurationContainers;
+	}
+
+	/**
+	 * Initialize and register output from OutputConfigurationContainer
+	 * 
+	 * @param outputConfigurationContainer
+	 * @return
+	 */
 	private void handleOutputConfiguration(OutputConfigurationContainer outConfContainer) {
 		String outputId = UUID.randomUUID().toString();
 		if (outConfContainer.extra.containsKey("name") && ((String)outConfContainer.extra.get("name")).length() > 0)
 			outputId = (String)outConfContainer.extra.get("name");
 		if (conf.getListener(outputId) == null) {
+			Output output = outConfContainer.outputConfiguration.createOutputInstance();
 			try {
-				conf.addListener(outputId, (CustomUpdateListener)new EventUpdateListener(outConfContainer.output));
+				conf.addListener(outputId, (CustomUpdateListener)new EventUpdateListener(output));
 			} catch (Exception e) {
-				log.debug("Could not register ouput with type {} (id: {}). Cause: {}", outConfContainer.output.getClass().getSimpleName(), outputId, e.getMessage(), e);
+				log.debug("Could not register ouput with type {} (id: {}). Cause: {}", output.getClass().getSimpleName(), outputId, e.getMessage(), e);
 			}
 		} else {
 			log.debug("listener with id {} already exists, skipping this one .. ", outputId);
@@ -1257,6 +1287,16 @@ public class CometConfigurationYaml {
 		}
 	}
 
+
+
+	/***
+	 * Generate list of output hashmaps from yaml configuration
+	 *
+	 * @param outputDefinition
+	 * @param <T>
+	 * @param <S>
+	 * @return
+	 */
 	private List<Map<String, Object>> normalizeOutputConfigurations(Object outputDefinition) {
 		List<Map<String, Object>> outputDefinitionList = new ArrayList<>();
 		if (outputDefinition instanceof String)
@@ -1320,40 +1360,5 @@ public class CometConfigurationYaml {
 		}
 
 		return outputDefinitionList;
-	}
-
-	private static FileOutputConfiguration parseFileConfiguration(Map<String, Object> outConf) {
-		if(!outConf.containsKey("file") && !outConf.containsKey("name")) {
-			throw new IllegalArgumentException("file output configuration must contain at least file or name parameters");
-		}
-		
-		FileOutputConfiguration oc = new FileOutputConfiguration();
-		String filename = outConf.containsKey("file")?(String)outConf.get("file"):((String)outConf.get("name")) + ".log";
-		
-		if(!filename.startsWith("/") && app != null && app.configuration != null && app.configuration.logConfiguration.logPath != null) {
-			filename = app.configuration.logConfiguration.logPath + File.separator + filename;
-		} else if(!filename.startsWith("/")) { // we have relative path, so prefix it with conf file path
-			filename = conf.sourceConfigurationPath + File.separator + filename;
-		}
-		oc.outFile = new File(filename);
-		oc.template = (String)outConf.get("out-format");
-		
-		return oc;
-	}
-		
-	
-	private static StdoutOutputConfiguration parseStdoutConfiguration(Map<String, Object> outConf) {
-		StdoutOutputConfiguration oc = new StdoutOutputConfiguration();
-		
-		String currentOutFormat = null;
-		if(outConf.containsKey("out-format")) {
-			currentOutFormat = (String)outConf.get("out-format");
-			File tmpFile = new File(conf.sourceConfigurationPath + File.separator + currentOutFormat); 
-			if(tmpFile.exists()) {
-				currentOutFormat = tmpFile.getAbsolutePath();
-			}
-		}
-		oc.template = currentOutFormat;
-		return oc;
 	}
 }

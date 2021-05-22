@@ -1,4 +1,4 @@
-package com.github.arikastarvo.comet.output;
+package com.github.arikastarvo.comet.output.stdout;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,10 +12,20 @@ import java.util.stream.Stream;
 
 import org.apache.commons.text.StringSubstitutor;
 
+import com.github.arikastarvo.comet.output.Output;
+import com.github.arikastarvo.comet.output.OutputConfiguration;
+import com.github.arikastarvo.comet.output.OutputConnector;
 import com.jsoniter.output.JsonStream;
 
-public class StdoutOutput implements Output {
 
+@OutputConnector(
+	name = StdoutOutput.NAME,
+	configuration = StdoutOutputConfiguration.class
+)
+public class StdoutOutput extends Output {
+
+	public static final String NAME = "stdout";
+	
 	public static Map<String, Object> asFlattendMap(Map<String, Object> map) {
 		return map.entrySet().stream()
 				.flatMap(StdoutOutput::flatten)
@@ -81,5 +91,10 @@ public class StdoutOutput implements Output {
 	
 	public String getDescription() {
 		return "Stdout";
+	}
+
+	@Override
+	public <T extends OutputConfiguration<T>> OutputConfiguration<T> getOutputConfiguration() {
+		return oc;
 	}
 }

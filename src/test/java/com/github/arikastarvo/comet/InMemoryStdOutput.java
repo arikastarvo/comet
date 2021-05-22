@@ -14,9 +14,10 @@ import java.util.stream.Collectors;
 import org.apache.commons.text.StringSubstitutor;
 
 import com.github.arikastarvo.comet.output.Output;
+import com.github.arikastarvo.comet.output.OutputConfiguration;
 import com.jsoniter.output.JsonStream;
 
-public class InMemoryStdOutput implements Output {
+public class InMemoryStdOutput extends Output {
 
 	String template;
 	List<Object> memData = new ArrayList<Object>();
@@ -78,6 +79,11 @@ public class InMemoryStdOutput implements Output {
 	@Override
 	public String getDescription() {
 		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <T extends OutputConfiguration<T>> OutputConfiguration<T> getOutputConfiguration() {
 		return null;
 	}
 }
