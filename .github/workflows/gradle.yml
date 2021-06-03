@@ -24,4 +24,9 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./gradlew build jacocoTestReport
+    - name: jacoco-badge-generator
+      uses: cicirello/jacoco-badge-generator@v2.2.1
+      with:
+        generate-branches-badge: true
+        jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
