@@ -1,5 +1,6 @@
-# COMET aka COMplex EvenT processor
+# COMET aka COMplex EvenT processori  
 
+![Coverage](.github/badges/jacoco.svg)
 
 NB! This tool is a product of a thesis project!  
 
