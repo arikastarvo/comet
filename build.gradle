@@ -12,6 +12,7 @@ plugins {
     id 'java-library'
 	id 'distribution'
 	id "com.github.johnrengelman.shadow" version "5.2.0"
+    id 'jacoco'
 }
 
 repositories {
@@ -153,6 +154,11 @@ javadoc {
 	options.overview = "src/overview.html"
 }
 
+jacocoTestReport {
+    reports {
+        csv.enabled true
+    }
+}
 
 jar {
 	enabled = false
