@@ -1,5 +1,6 @@
 # COMET aka COMplex EvenT processor
 
+
 NB! This tool is a product of a thesis project!  
 
 Comet is for processing textual data line-by-line as a stream of events and providing Esper EPL query functionality on that data. Mostly oriented for processing streaming logs. Sample use-cases:  
