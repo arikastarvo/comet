@@ -35,6 +35,9 @@ public abstract class Input<T extends Input<T>> extends Thread {
 	
 	public <S extends InputConfiguration<S>> Input(InputConfiguration<S> inputConfiguration) {
 		this.ic = inputConfiguration;
+		if(this.ic.getMonitorRuntimeConfiguration() != null) {
+			this.monitorRuntimeConfiguration = this.ic.getMonitorRuntimeConfiguration();
+		}
 	}
 	
 	public T setId(String id) {
@@ -48,7 +51,9 @@ public abstract class Input<T extends Input<T>> extends Thread {
 	}
 	
 	public void Stop() {
-		monitorRuntime.stopInput(id);
+		if(monitorRuntime != null) {
+			monitorRuntime.stopInput(id);
+		}
 		isShutdown = true;
 	}
 	

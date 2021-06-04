@@ -157,8 +157,12 @@ javadoc {
 jacocoTestReport {
     reports {
         csv.enabled true
+		//html.enabled true
+		html.destination file("${buildDir}/reports/jacoco/jacocoHtml")
     }
 }
+
+test.finalizedBy jacocoTestReport
 
 jar {
 	enabled = false

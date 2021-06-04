@@ -38,6 +38,10 @@ public abstract class InputConfiguration<T extends InputConfiguration<T>> extend
 		super();
 		this.monitorRuntimeConfiguration = monitorRuntimeConfiguration;
 	}
+
+	public MonitorRuntimeConfiguration getMonitorRuntimeConfiguration() {
+		return this.monitorRuntimeConfiguration;
+	}
 	
 	public static <T extends InputConfiguration<T>> List<Class<T>> getInputConfigurationClasses() {
 
