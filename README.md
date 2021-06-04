@@ -1,5 +1,6 @@
 # COMET aka COMplex EvenT processori  
 
+![example workflow](https://github.com/arikastarvo/comet/actions/workflows/gradle.yml/badge.svg)
 ![Coverage](.github/badges/jacoco.svg)
 
 NB! This tool is a product of a thesis project!  
