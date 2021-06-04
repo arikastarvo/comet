@@ -37,19 +37,30 @@ public class FileInputConfiguration extends InputConfiguration<FileInputConfigur
 	
 	@Override
 	public InputConfiguration parseMapInputDefinition(Map<String, Object> inputDefinition) throws InputDefinitionException {
+
+		if(!inputDefinition.containsKey("type") || !inputDefinition.get("type").equals(getInputType())) {
+			throw new InputDefinitionException("no type defined or wrong type for file input");
+		}
+
 		if (!inputDefinition.containsKey("file")) {
 			throw new InputDefinitionException("file has to be specified for file input");
 		}
 		
+		this.files.clear();
+		
 		if(inputDefinition.get("file") instanceof String) {
 			String pathValue = (String)inputDefinition.get("file");
-			if(!pathValue.startsWith("/")) {
+			if(!pathValue.startsWith("/") && monitorRuntimeConfiguration.sourceConfigurationPath != null) {
 				pathValue = monitorRuntimeConfiguration.sourceConfigurationPath + File.separator + pathValue;
 			}
 			files.add(pathValue);
 		} else if (inputDefinition.get("file") instanceof List) {
 			files.addAll(((List<String>)inputDefinition.get("file")).stream().map( (String val) -> {
-				return val.startsWith("/")?val:(monitorRuntimeConfiguration.sourceConfigurationPath + File.separator + val);
+				if(!val.startsWith("/") && monitorRuntimeConfiguration.sourceConfigurationPath != null) {
+					return (monitorRuntimeConfiguration.sourceConfigurationPath + File.separator + val);
+				} else {
+					return val;
+				}
 			}).collect(Collectors.toList()));
 		} else {
 			throw new InputDefinitionException("file has to be defined as a string or list of strings");
@@ -59,10 +70,10 @@ public class FileInputConfiguration extends InputConfiguration<FileInputConfigur
 			this.name = (String)inputDefinition.get("name");
 		}
 		
-		//this.files = new FileInputConfiguration(fileNames);
 		if(inputDefinition.containsKey("tail") && inputDefinition.get("tail") instanceof Boolean) {
 			this.tail = (Boolean)inputDefinition.get("tail");
-		} if(inputDefinition.containsKey("repeat") && inputDefinition.get("repeat") instanceof Integer) {
+		}
+		if(inputDefinition.containsKey("repeat") && inputDefinition.get("repeat") instanceof Integer) {
 			if(this.tail) {
 				throw new InputDefinitionException("tail and repeat can not be defined together for file input");
 			}
@@ -72,7 +83,7 @@ public class FileInputConfiguration extends InputConfiguration<FileInputConfigur
 	}
 	
 	@Override
-	public Input<FileInput> createInputInstance() {
+	public FileInput createInputInstance() {
 
 		FileInput input = new FileInput(this);
 		if(this.name != null) {
