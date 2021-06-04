@@ -25,8 +25,14 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build jacocoTestReport
-    - name: jacoco-badge-generator
+    - name: Jacoco coverage badge generator
       uses: cicirello/jacoco-badge-generator@v2.2.1
       with:
         generate-branches-badge: true
         jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
+    - name: commit badge
+      uses: EndBug/add-and-commit@v7 # You can change this to use a specific version
+      with: 
+        add: '.github/badges'
+        author_name: github actions
+        message: coverage badge
