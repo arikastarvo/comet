@@ -1,7 +1,9 @@
 package com.github.arikastarvo.comet;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Test;
 
 import com.github.arikastarvo.comet.input.file.FileInput;
 import com.github.arikastarvo.comet.input.file.FileInputConfiguration;
@@ -60,9 +61,9 @@ public class FilePersistenceTest {
     	runtime.waitInput = true;
     	runtime.run();
 		
-    	assertEquals("total eventcount wrong", 1, cul.totalNewEvents);
+    	assertEquals(1, cul.totalNewEvents, "total eventcount wrong");
     	Map<String, Map<String, Integer>> stats = runtime.getParser().getStats().stats();
-    	assertEquals("there should be at least one 'logevents'", 1, (int)stats.get("matchcount").get("logevents"));
+    	assertEquals(1, (int)stats.get("matchcount").get("logevents"), "there should be at least one 'logevents'");
 
     	runtime.persistenceManager.persistencePersist();
     	runtime.Stop();
@@ -73,10 +74,10 @@ public class FilePersistenceTest {
     	System.out.println(filePath);
     	
     	File persistFile = new File(filePath);
-    	assertTrue("persistFile must exsist", persistFile.exists());
+    	assertTrue(persistFile.exists(), "persistFile must exsist");
     	if(persistFile.exists()) {
     		File referenceFile = new File("src/test/resources/persistence.logeventsWindow.data");
-    		assertTrue("persistence reference data missing", referenceFile.exists());
+    		assertTrue(referenceFile.exists(), "persistence reference data missing");
     		
     		// this failed because some emtpy values in json turned into null values.. go figure...
     		//assertTrue("persistence file contents wrong", FileUtils.contentEquals(persistFile, referenceFile));
@@ -88,7 +89,7 @@ public class FilePersistenceTest {
 		    refData = JsonIterator.deserialize(new FileInputStream(persistFile).readAllBytes()).as(refData.getClass());
 		    
 		    if((persistData.size() > 0 && persistData.get(0).containsKey("logts_timestamp") && persistData.get(0).get("logts_timestamp") instanceof String) && (refData.size() > 0 && refData.get(0).containsKey("logts_timestamp") && refData.get(0).get("logts_timestamp") instanceof String)) {
-		    	assertEquals("persistence file contents mismatch", (String)persistData.get(0).get("logts_timestamp"), (String)refData.get(0).get("logts_timestamp"));
+		    	assertEquals((String)persistData.get(0).get("logts_timestamp"), (String)refData.get(0).get("logts_timestamp"), "persistence file contents mismatch");
 		    }
     		persistFile.delete();
     	}
@@ -130,10 +131,10 @@ public class FilePersistenceTest {
     	
     	runtime.run();
 
-    	assertEquals("total eventcount wrong", 1, cul.totalNewEvents);
+    	assertEquals(1, cul.totalNewEvents, "total eventcount wrong");
     	List<Map<String, Object>> result = runtime.fireAndForget("select * from logeventsWindow", false);
-    	assertEquals("wrong data", "data", (String)result.get(0).get("data"));
-    	assertEquals("wrong data", "1234", (String)result.get(0).get("pid"));
+    	assertEquals("data", (String)result.get(0).get("data"), "wrong data");
+    	assertEquals("1234", (String)result.get(0).get("pid"), "wrong data");
 
     	runtime.Stop();
     }

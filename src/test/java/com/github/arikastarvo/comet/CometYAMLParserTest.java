@@ -1,12 +1,11 @@
 package com.github.arikastarvo.comet;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Map;
-
-import org.junit.Test;
 
 import com.github.arikastarvo.comet.MonitorRuntimeConfiguration;
 import com.github.arikastarvo.comet.CometConfigurationYaml;
@@ -23,26 +22,26 @@ public class CometYAMLParserTest {
     	CometConfigurationYaml.parseConfiguration("src/test/resources/configs/input-1.yaml", null, runtimeConf);
     	
     	// inputs
-    	assertEquals("no inputs detected", true, runtimeConf.hasInputs());
+    	assertEquals(true, runtimeConf.hasInputs(), "no inputs detected");
     	Map<String, Input> inputs = runtimeConf.getInputs();
     	
-    	assertEquals("no noop found", true, inputs.containsKey("noop"));
-    	assertEquals("no stdin found", true, inputs.containsKey("stdin"));
+    	assertEquals(true, inputs.containsKey("noop"), "no noop found");
+    	assertEquals(true, inputs.containsKey("stdin"), "no stdin found");
     	
-    	assertEquals("no csvinput found", true, inputs.containsKey("csvinput"));
-    	assertEquals("wrong window prop value for csvinput", true, ((CSVInput)inputs.get("csvinput")).getInputConfiguration().createAsWindow);
-    	assertEquals("csvinput content field should be null", true, ((CSVInput)inputs.get("csvinput")).getInputConfiguration().content == null);
+    	assertEquals(true, inputs.containsKey("csvinput"), "no csvinput found");
+    	assertEquals(true, ((CSVInput)inputs.get("csvinput")).getInputConfiguration().createAsWindow, "wrong window prop value for csvinput");
+    	assertEquals(true, ((CSVInput)inputs.get("csvinput")).getInputConfiguration().content == null, "csvinput content field should be null");
     	
-    	assertEquals("no csvinput2 found", true, inputs.containsKey("csvinput2"));
-    	assertEquals("csvinput2 content field should be non-null", true, ((CSVInput)inputs.get("csvinput2")).getInputConfiguration().content != null);
+    	assertEquals(true, inputs.containsKey("csvinput2"), "no csvinput2 found");
+    	assertEquals(true, ((CSVInput)inputs.get("csvinput2")).getInputConfiguration().content != null, "csvinput2 content field should be non-null");
     	
-    	assertEquals("no listinput found", true, inputs.containsKey("listinput"));
-    	assertEquals("wrong window prop value for listinput", true, ((StaticListInput)inputs.get("listinput")).getInputConfiguration().createAsWindow);
+    	assertEquals(true, inputs.containsKey("listinput"), "no listinput found");
+    	assertEquals(true, ((StaticListInput)inputs.get("listinput")).getInputConfiguration().createAsWindow, "wrong window prop value for listinput");
     	
 
-    	assertEquals("no file_1 found", true, inputs.containsKey("file_1"));
-    	assertEquals("there must be 1 file defined in file_1 input", 1, ((FileInput)inputs.get("file_1")).getInputConfiguration().files.size());
-    	assertEquals("there must be input-1.yaml file defined in file_1 input", true, ((FileInput)inputs.get("file_1")).getInputConfiguration().files.get(0).endsWith("input-1.yaml"));
+    	assertEquals(true, inputs.containsKey("file_1"), "no file_1 found");
+    	assertEquals(1, ((FileInput)inputs.get("file_1")).getInputConfiguration().files.size(), "there must be 1 file defined in file_1 input");
+    	assertEquals(true, ((FileInput)inputs.get("file_1")).getInputConfiguration().files.get(0).endsWith("input-1.yaml"), "there must be input-1.yaml file defined in file_1 input");
     	
     }
     
@@ -53,15 +52,15 @@ public class CometYAMLParserTest {
     	CometConfigurationYaml.parseConfiguration("src/test/resources/configs/query-1.yaml", null, runtimeConf);
     	
     	// check for noop input
-    	assertEquals("no inputs detected", true, runtimeConf.hasInputs());
+    	assertEquals(true, runtimeConf.hasInputs(), "no inputs detected");
     	Map<String, Input> inputs = runtimeConf.getInputs();
-    	assertEquals("noop input not found", true, inputs.containsKey("noop"));
+    	assertEquals(true, inputs.containsKey("noop"), "noop input not found");
     	
     	// statement
-    	assertEquals("no statements detected", true, runtimeConf.hasStatements());
+    	assertEquals(true, runtimeConf.hasStatements(), "no statements detected");
     	Map<String, Map<String, String>> statements = runtimeConf.getStatements();
-    	assertEquals("there must be one module deployed", 1, statements.size());
-    	assertEquals("wrong statement", "select * from events", statements.values().stream().findFirst().get().get("statement"));
+    	assertEquals(1, statements.size(), "there must be one module deployed");
+    	assertEquals("select * from events", statements.values().stream().findFirst().get().get("statement"), "wrong statement");
     }
 
     @Test
@@ -70,12 +69,12 @@ public class CometYAMLParserTest {
     	CometConfigurationYaml.parseConfiguration("src/test/resources/configs/query-2.yaml", null, runtimeConf);
     	
     	// statement
-    	assertEquals("no statements detected", true, runtimeConf.hasStatements());
+    	assertEquals(true, runtimeConf.hasStatements(), "no statements detected");
     	Map<String, Map<String, String>> statements = runtimeConf.getStatements();
-    	assertEquals("there must be one module deployed", 3, statements.size());
-    	assertEquals("wrong statement", "select * from events", new ArrayList<Map<String, String>>(statements.values()).get(0).get("statement"));
-    	assertEquals("wrong statement", "select * from logevents", new ArrayList<Map<String, String>>(statements.values()).get(1).get("statement"));
-    	assertEquals("wrong statement", "select data from events", new ArrayList<Map<String, String>>(statements.values()).get(2).get("statement"));
+    	assertEquals(3, statements.size(), "there must be one module deployed");
+    	assertEquals("select * from events", new ArrayList<Map<String, String>>(statements.values()).get(0).get("statement"), "wrong statement");
+    	assertEquals("select * from logevents", new ArrayList<Map<String, String>>(statements.values()).get(1).get("statement"), "wrong statement");
+    	assertEquals("select data from events", new ArrayList<Map<String, String>>(statements.values()).get(2).get("statement"), "wrong statement");
     }
 
     @Test
@@ -84,11 +83,11 @@ public class CometYAMLParserTest {
     	CometConfigurationYaml.parseConfiguration("src/test/resources/configs/query-3.yaml", null, runtimeConf);
     	
     	// statement
-    	assertEquals("no statements detected", true, runtimeConf.hasStatements());
+    	assertEquals(true, runtimeConf.hasStatements(), "no statements detected");
     	Map<String, Map<String, String>> statements = runtimeConf.getStatements();
-    	assertEquals("there must be one module deployed", 1, statements.size());
-    	assertEquals("there must be statement named 'myquery'", true, statements.containsKey("myquery"));
-    	assertEquals("wrong statement", "select * from events", new ArrayList<Map<String, String>>(statements.values()).get(0).get("statement"));
+    	assertEquals(1, statements.size(), "there must be one module deployed");
+    	assertEquals(true, statements.containsKey("myquery"), "there must be statement named 'myquery'");
+    	assertEquals("select * from events", new ArrayList<Map<String, String>>(statements.values()).get(0).get("statement"), "wrong statement");
     }
 
     @Test
@@ -97,15 +96,15 @@ public class CometYAMLParserTest {
     	CometConfigurationYaml.parseConfiguration("src/test/resources/configs/query-4.yaml", null, runtimeConf);
     	
     	// statement
-    	assertEquals("no statements detected", true, runtimeConf.hasStatements());
+    	assertEquals(true, runtimeConf.hasStatements(), "no statements detected");
     	Map<String, Map<String, String>> statements = runtimeConf.getStatements();
-    	assertEquals("there must be one module deployed", 3, statements.size());
-    	assertEquals("there must be statement named 'myquery'", true, statements.containsKey("myquery"));
-    	assertEquals("wrong statement", "select * from events", statements.get("myquery").get("statement"));
-    	assertEquals("there must be statement named 'myquery-1'", true, statements.containsKey("myquery-1"));
-    	assertEquals("wrong statement", "select * from logevents", statements.get("myquery-1").get("statement"));
-    	assertEquals("there must be statement named 'myquery-2'", true, statements.containsKey("myquery-2"));
-    	assertEquals("wrong statement", "select data from events", statements.get("myquery-2").get("statement"));
+    	assertEquals(3, statements.size(), "there must be one module deployed");
+    	assertEquals(true, statements.containsKey("myquery"), "there must be statement named 'myquery'");
+    	assertEquals("select * from events", statements.get("myquery").get("statement"), "wrong statement");
+    	assertEquals(true, statements.containsKey("myquery-1"), "there must be statement named 'myquery-1'");
+    	assertEquals("select * from logevents", statements.get("myquery-1").get("statement"), "wrong statement");
+    	assertEquals(true, statements.containsKey("myquery-2"), "there must be statement named 'myquery-2'");
+    	assertEquals("select data from events", statements.get("myquery-2").get("statement"), "wrong statement");
     }
 
 
@@ -114,12 +113,11 @@ public class CometYAMLParserTest {
     	MonitorRuntimeConfiguration runtimeConf = new MonitorRuntimeConfiguration(null);
     	CometConfigurationYaml.parseConfiguration("src/test/resources/configs/persistence-1.yaml", null, runtimeConf);
     	
-    	System.out.println(runtimeConf.persistenceConfiguration.persistence);
     	// tests
-    	assertEquals("initial load should be true by default", true, runtimeConf.persistenceConfiguration.initialLoad);
-    	assertEquals("initial persistence interval should be 60", 60, runtimeConf.persistenceConfiguration.persistenceInterval);
-    	assertEquals("there must be 1 persistence item", 1, runtimeConf.persistenceConfiguration.persistence.size());
-    	assertEquals("persistence item must be eventsWindow", "eventsWindow", runtimeConf.persistenceConfiguration.persistence.get(0));
+    	assertEquals(true, runtimeConf.persistenceConfiguration.initialLoad, "initial load should be true by default");
+    	assertEquals(60, runtimeConf.persistenceConfiguration.persistenceInterval, "initial persistence interval should be 60");
+    	assertEquals(1, runtimeConf.persistenceConfiguration.persistence.size(), "there must be 1 persistence item");
+    	assertEquals("eventsWindow", runtimeConf.persistenceConfiguration.persistence.get(0), "persistence item must be eventsWindow");
     }
 
     @Test
@@ -128,9 +126,9 @@ public class CometYAMLParserTest {
     	CometConfigurationYaml.parseConfiguration("src/test/resources/configs/persistence-2.yaml", null, runtimeConf);
     	
     	// tests
-    	assertEquals("there must be 2 persistence items", 2, runtimeConf.persistenceConfiguration.persistence.size());
-    	assertTrue("persistence item eventsWindow must exist", runtimeConf.persistenceConfiguration.persistence.contains("eventsWindow"));
-    	assertTrue("persistence item logeventsWindow must exist", runtimeConf.persistenceConfiguration.persistence.contains("logeventsWindow"));
+    	assertEquals(2, runtimeConf.persistenceConfiguration.persistence.size(), "there must be 2 persistence items");
+    	assertTrue(runtimeConf.persistenceConfiguration.persistence.contains("eventsWindow"), "persistence item eventsWindow must exist");
+    	assertTrue(runtimeConf.persistenceConfiguration.persistence.contains("logeventsWindow"), "persistence item logeventsWindow must exist");
     }
 
     @Test
@@ -139,8 +137,8 @@ public class CometYAMLParserTest {
     	CometConfigurationYaml.parseConfiguration("src/test/resources/configs/persistence-3.yaml", null, runtimeConf);
     	
     	// tests
-    	assertEquals("there must be 1 persistence items", 1, runtimeConf.persistenceConfiguration.persistence.size());
-    	assertEquals("persistence interval should be 10", 10, runtimeConf.persistenceConfiguration.persistenceInterval);
+    	assertEquals(1, runtimeConf.persistenceConfiguration.persistence.size(), "there must be 1 persistence items");
+    	assertEquals(10, runtimeConf.persistenceConfiguration.persistenceInterval, "persistence interval should be 10");
     }
     /** there should be some more different scenarios covered actually **/
 }

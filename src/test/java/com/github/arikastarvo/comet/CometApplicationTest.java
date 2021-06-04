@@ -1,17 +1,12 @@
 package com.github.arikastarvo.comet;
 
-import static org.junit.Assert.assertEquals;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.junit.Test;
-
-import com.github.arikastarvo.comet.MonitorRuntime;
-import com.github.arikastarvo.comet.MonitorRuntimeConfiguration;
 import com.github.arikastarvo.comet.input.file.FileInput;
 import com.github.arikastarvo.comet.input.file.FileInputConfiguration;
-import com.github.arikastarvo.comet.output.noop.NoopOutput;
 import com.github.arikastarvo.comet.parser.Parser;
 import com.github.arikastarvo.comet.runtime.MonitorRuntimeEsperImpl;
 
@@ -44,14 +39,14 @@ public class CometApplicationTest {
     	runtime.waitInput = true;
     	runtime.run();
 		
-    	assertEquals("total eventcount wrong", 1, cul.totalNewEvents);
+    	assertEquals(1, cul.totalNewEvents, "total eventcount wrong");
     	
     	Map<String, Map<String, Integer>> stats = runtime.getParser().getStats().stats();
-    	assertEquals("there should be at least one 'logevents'", 1, (int)stats.get("matchcount").get("logevents"));
+    	assertEquals(1, (int)stats.get("matchcount").get("logevents"), "there should be at least one 'logevents'");
 
     	String s = "Logline from localhost @ 2020-04-14T14:11:21+03:00. Source PID was 1234.";
-    	assertEquals("memdata count wrong", 1, imo.memData.size());
-    	assertEquals("memdata content wrong", s, imo.memData.get(0));
+    	assertEquals(1, imo.memData.size(), "memdata count wrong");
+    	assertEquals(s, imo.memData.get(0), "memdata content wrong");
     	
     	runtime.Stop();
     }

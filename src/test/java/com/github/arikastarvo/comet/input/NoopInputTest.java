@@ -1,43 +1,37 @@
 package com.github.arikastarvo.comet.input;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-//import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.HashMap;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import com.github.arikastarvo.comet.MonitorRuntimeConfiguration;
 import com.github.arikastarvo.comet.input.noop.NoopInput;
 import com.github.arikastarvo.comet.input.noop.NoopInputConfiguration;
 
 public class NoopInputTest {
-    
-	@Rule
-	public ExpectedException exceptionRule = ExpectedException.none();
 
     @Test
     public void NoopInputConfigurationTest() throws Exception {
 		MonitorRuntimeConfiguration runtimeConfiguration = new MonitorRuntimeConfiguration();
 		NoopInputConfiguration inputConfiguration = new NoopInputConfiguration(runtimeConfiguration);
 		
-		exceptionRule.expect(InputDefinitionException.class);
-		exceptionRule.expectMessage("no type defined");
-		inputConfiguration.parseMapInputDefinition(new HashMap<String, Object>());
+		Exception exception;
 
-		exceptionRule.expectMessage(String.format("type has to be %s", inputConfiguration.getInputType()));
-		inputConfiguration.parseMapInputDefinition(new HashMap<String, Object>(){{
-			put("type", "non-noop");
-		}});
-		exceptionRule.expectMessage("");
+		exception = assertThrows(InputDefinitionException.class, () -> {
+			inputConfiguration.parseMapInputDefinition(new HashMap<String, Object>());
+        });
+		assertEquals(exception.getMessage(), "no type defined");
+
+		
+		exception = assertThrows(InputDefinitionException.class, () -> {
+			inputConfiguration.parseMapInputDefinition(new HashMap<String, Object>(){{
+				put("type", "non-noop");
+			}});
+        });
+		assertEquals(exception.getMessage(), String.format("type has to be %s", inputConfiguration.getInputType()));
 		
 		
 		assertEquals(inputConfiguration.finite, false);
@@ -67,12 +61,12 @@ public class NoopInputTest {
 		}});
 		NoopInput input = new NoopInput(inputConfiguration);
 
-		assertEquals(input.isFinite(), true);
+		assertTrue(input.isFinite());
 
 		inputConfiguration.finite = false;
 		assertEquals(input.isAlive(), false);
 		input.start();
-		assertEquals(input.isAlive(), true);
+		assertTrue(input.isAlive());
 		input.shutdown();
 	}
 }

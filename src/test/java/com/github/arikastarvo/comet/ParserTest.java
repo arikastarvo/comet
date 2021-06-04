@@ -1,13 +1,13 @@
 package com.github.arikastarvo.comet;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import org.junit.Test;
 
 import com.github.arikastarvo.comet.parser.Parser;
 import com.github.arikastarvo.comet.parser.PatternDefinition;
@@ -18,14 +18,14 @@ public class ParserTest {
     public void testBaseInit() throws Exception {
 
     	Parser parser = new Parser();
-    	assertEquals("there should be 2 basepatterns", 2, parser.getPatterns().size());
+    	assertEquals(2, parser.getPatterns().size(), "there should be 2 basepatterns");
     	
     	parser = new Parser.Builder().build();
-    	assertEquals("there should be 2 basepatterns", 2, parser.getPatterns().size());
+    	assertEquals(2, parser.getPatterns().size(), "there should be 2 basepatterns");
     	
-    	assertEquals("there should be pattern named 'logevents'", 1, parser.getPatterns().stream().filter(pat -> pat.getName().equals("logevents")).count());
-    	assertEquals("pattern named 'logevents' should 1 parent", 1, parser.getPatterns().stream().filter(pat -> pat.getName().equals("logevents")).findFirst().get().getParents().size());
-    	assertEquals("pattern named 'logevents' should have parent named 'events'", "events", parser.getPatterns().stream().filter(pat -> pat.getName().equals("logevents")).findFirst().get().getParents().get(0));
+    	assertEquals(1, parser.getPatterns().stream().filter(pat -> pat.getName().equals("logevents")).count(), "there should be pattern named 'logevents'");
+    	assertEquals(1, parser.getPatterns().stream().filter(pat -> pat.getName().equals("logevents")).findFirst().get().getParents().size(), "pattern named 'logevents' should 1 parent");
+    	assertEquals("events", parser.getPatterns().stream().filter(pat -> pat.getName().equals("logevents")).findFirst().get().getParents().get(0), "pattern named 'logevents' should have parent named 'events'");
     }
     
     @Test
@@ -37,19 +37,19 @@ public class ParserTest {
     	PatternDefinition substrPattern = new PatternDefinition.Builder("custom_key").withParent("custom_str").withSourceField("customvalue").withPattern("key=%{LD:keyvalue}").build();
     	
     	parser = new Parser.Builder().withPatternDefinition(intPattern).withPatternDefinition(strPattern).withPatternDefinition(substrPattern).build();
-    	assertEquals("there should be 5 patterns", 5, parser.getPatterns().size());
+    	assertEquals(5, parser.getPatterns().size(), "there should be 5 patterns");
     	
     	Map<String, Object> data;
     	data = parser.matchline("4");
-    	assertEquals("parsed result should have field 'customvalue' with value 4", 4, data.get("customvalue"));
+    	assertEquals(4, data.get("customvalue"), "parsed result should have field 'customvalue' with value 4");
     	
     	data = parser.matchline("random string");
-    	assertEquals("parsed result should have field 'customvalue' with value 'random string'", "random string", data.get("customvalue"));
+    	assertEquals("random string", data.get("customvalue"), "parsed result should have field 'customvalue' with value 'random string'");
 
     	data = parser.matchline("key=keyval");
-    	assertTrue("parsed event should have custom_str as a parent eventType", ((List<String>)data.get("__match")).contains("custom_str"));
-    	assertEquals("parsed event should be of type custom_key", "custom_key", data.get("eventType"));
-    	assertEquals("parsed result should have field 'keyvalue' with value 'keyval'", "keyval", data.get("keyvalue"));
+    	assertTrue(((List<String>)data.get("__match")).contains("custom_str"), "parsed event should have custom_str as a parent eventType");
+    	assertEquals("custom_key", data.get("eventType"), "parsed event should be of type custom_key");
+    	assertEquals("keyval", data.get("keyvalue"), "parsed result should have field 'keyvalue' with value 'keyval'");
     }
 
     
@@ -62,13 +62,13 @@ public class ParserTest {
     	
     	parser = new Parser.Builder().withPatternDefinition(pattern).build();
     			
-    	assertEquals("there should be 3 patterns", 3, parser.getPatterns().size());
+    	assertEquals(3, parser.getPatterns().size(), "there should be 3 patterns");
 
     	Map<String, Object> data;
     	data = parser.matchline("2019-03-07T00:00:14+02:00\tmydata");
     	
-    	assertEquals("srctime does not match", 1551909614000L, data.get("src_logts_timestamp"));
-    	assertEquals("data does not match", "mydata", data.get("data"));
+    	assertEquals(1551909614000L, data.get("src_logts_timestamp"), "srctime does not match");
+    	assertEquals("mydata", data.get("data"), "data does not match");
     }
     
     @Test
@@ -81,21 +81,21 @@ public class ParserTest {
     	
     	
     	data = parser.matchline("logline");
-    	assertTrue("there should be an event type", data.containsKey("eventType"));
-    	assertTrue("there should be an event type", data.containsKey("data"));
-    	assertEquals("event type should be 'events'", "events", data.get("eventType"));
-    	assertEquals("wrong parse output", "logline", data.get("data"));
+    	assertTrue(data.containsKey("eventType"), "there should be an event type");
+    	assertTrue(data.containsKey("data"), "there should be an event type");
+    	assertEquals("events", data.get("eventType"), "event type should be 'events'");
+    	assertEquals("logline", data.get("data"), "wrong parse output");
     	
     	data = parser.matchline("2020-04-14T14:11:21+03:00\tlocalhost\t1234\tlogline");
-    	assertTrue("there should be an event type", data.containsKey("eventType"));
-    	assertEquals("eventType should be 'logevents'", "logevents", ((String)data.get("eventType")));
-    	assertTrue("there should be an data", data.containsKey("data"));
-    	assertTrue("there should be __matches filed", data.containsKey("__match"));
-    	assertTrue("__matches filed should be List", data.get("__match") instanceof List);
-    	assertEquals("there should be 2 __matches", 2, (((List)data.get("__match")).size()));
-    	assertEquals("host should be 'localhost'", "localhost", ((String)data.get("host")));
-    	assertEquals("pid should be '1234'", "1234", ((String)data.get("pid")));
-    	assertEquals("data should be 'logline'", "logline", ((String)data.get("data")));
+    	assertTrue(data.containsKey("eventType"), "there should be an event type");
+    	assertEquals("logevents", ((String)data.get("eventType")), "eventType should be 'logevents'");
+    	assertTrue(data.containsKey("data"), "there should be an data");
+    	assertTrue(data.containsKey("__match"), "there should be __matches filed");
+    	assertTrue(data.get("__match") instanceof List, "__matches filed should be List");
+    	assertEquals(2, (((List)data.get("__match")).size()), "there should be 2 __matches");
+    	assertEquals("localhost", ((String)data.get("host")), "host should be 'localhost'");
+    	assertEquals("1234", ((String)data.get("pid")), "pid should be '1234'");
+    	assertEquals("logline", ((String)data.get("data")), "data should be 'logline'");
     	
     }
     
