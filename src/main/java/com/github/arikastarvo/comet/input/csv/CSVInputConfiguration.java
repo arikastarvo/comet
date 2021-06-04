@@ -37,6 +37,7 @@ public class CSVInputConfiguration extends InputConfiguration<CSVInputConfigurat
 
 	@Override
 	public CSVInputConfiguration parseMapInputDefinition(Map<String, Object> inputDefinition) throws InputDefinitionException {
+		
 		if(! inputDefinition.containsKey("file") && !inputDefinition.containsKey("content")) {
 			throw new InputDefinitionException("for CSV input, file or content field must be set");
 		} else if(! inputDefinition.containsKey("name") || ! (inputDefinition.get("name") instanceof String)) {
@@ -45,7 +46,7 @@ public class CSVInputConfiguration extends InputConfiguration<CSVInputConfigurat
 
 			if(inputDefinition.containsKey("file")) {
 				String pathValue = (String)inputDefinition.get("file");
-				if(!pathValue.startsWith("/")) {
+				if(!pathValue.startsWith("/") && monitorRuntimeConfiguration.sourceConfigurationPath != null) {
 					pathValue = monitorRuntimeConfiguration.sourceConfigurationPath + File.separator + pathValue;
 				}
 				this.file = pathValue;
@@ -75,7 +76,7 @@ public class CSVInputConfiguration extends InputConfiguration<CSVInputConfigurat
 	}
 
 	@Override
-	public Input<CSVInput> createInputInstance() {
+	public CSVInput createInputInstance() {
 		CSVInput input = new CSVInput(this);
 		input.id = this.name;
 		return input;
@@ -103,8 +104,9 @@ public class CSVInputConfiguration extends InputConfiguration<CSVInputConfigurat
 		FileInputConfiguration fic = new FileInputConfiguration(monitorRuntimeConfiguration);
 		conf.putAll(fic.parseURIInputDefinition(inputDefinition));
 		conf.put("type", "csv");
-		conf.put("name", conf.get("file"));
-		
+		if(conf.containsKey("file") && conf.get("file") instanceof List) {			
+			conf.put("name", ((List<String>)conf.get("file")).get(0));
+		}
 		return conf;
 	}
 	

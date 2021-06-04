@@ -2,6 +2,7 @@ package com.github.arikastarvo.comet.input;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
@@ -29,6 +30,10 @@ public class FileInputTest {
 		MonitorRuntimeConfiguration runtimeConfiguration = new MonitorRuntimeConfiguration();
 		FileInputConfiguration inputConfiguration = new FileInputConfiguration(runtimeConfiguration);
 		
+		assertTrue(inputConfiguration.getSupportedSchemeList().contains("file"));
+		assertTrue(inputConfiguration.isSchemeSupported("file"));
+		assertFalse(inputConfiguration.isSchemeSupported("clouds"));
+
 		Exception exception;
 
 		exception = assertThrows(InputDefinitionException.class, () -> {

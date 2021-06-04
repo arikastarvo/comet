@@ -92,6 +92,7 @@ public class CSVInput extends Input<CSVInput> implements FiniteInput, ReferenceI
 				log.error("could not parse fileds from csv header in csv input {}, error: {}", this.id, e.getMessage());
 			}
 		}
+
 		if(headerParsed) {
 			for(Map.Entry<String, String> entry : ic.fields.entrySet()) {
 				if (mergedFields.containsKey(entry.getKey())) {
