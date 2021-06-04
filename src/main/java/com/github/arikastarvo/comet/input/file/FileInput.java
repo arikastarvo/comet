@@ -131,7 +131,9 @@ public class FileInput extends Input<FileInput> implements RepeatableInput, Refe
 				}
 				
 				log.debug("regular file input (no tailing, no repetitions) finished");
-				monitorRuntime.stopInput(id);
+				if(monitorRuntime != null) {
+					monitorRuntime.stopInput(id);
+				}
 			} catch (IOException e) {
 				log.error("error during file input init: " + e.getMessage());
 				log.debug("error during file input init: " + e.getMessage(), e);
@@ -194,8 +196,13 @@ public class FileInput extends Input<FileInput> implements RepeatableInput, Refe
 			if (filenameMetadataBuffer.containsKey(reader.hashCode())) {
 				parsed.putAll(filenameMetadataBuffer.get(reader.hashCode()));
 			}
-			monitorRuntime.parse(contentLine, parsed, true, this.id);
 			
+			if(monitorRuntime != null) {
+				monitorRuntime.parse(contentLine, parsed, true, this.id);
+			} else {
+				parsed.put("data", contentLine);
+			}
+
 			if(parsed.containsKey("logts_timestamp") && parsed.get("logts_timestamp") instanceof Long) {
 				sortedIndex.put(reader.hashCode(), (Long)parsed.get("logts_timestamp"));
 			} else {
@@ -218,8 +225,13 @@ public class FileInput extends Input<FileInput> implements RepeatableInput, Refe
 				contentLine = reader.readLine();
 				parsed = new HashMap<String, Object>();
 				parsed.putAll(filenameMetadataBuffer.get(reader.hashCode()));
-				monitorRuntime.parse(contentLine, parsed, true, this.id);
 				
+				if(monitorRuntime != null) {
+					monitorRuntime.parse(contentLine, parsed, true, this.id);
+				} else {
+					parsed.put("data", contentLine);
+				}
+
 				if(parsed.containsKey("logts_timestamp") && parsed.get("logts_timestamp") instanceof Long) {
 					sortedIndex.put(reader.hashCode(), (Long)parsed.get("logts_timestamp"));
 				} else {
@@ -242,10 +254,13 @@ public class FileInput extends Input<FileInput> implements RepeatableInput, Refe
 				// we output current first item
 				Map<String, Object> cur = contentBuffer.get(lowestKey);
 				
-				List<String> curMatchedTypes = null;
-				curMatchedTypes = (List<String>)cur.get("__match");
-				
-				cur.put("eventType", (String)curMatchedTypes.get(curMatchedTypes.size()-1));
+				List<String> curMatchedTypes = new ArrayList<String>();
+				if(cur != null && cur.containsKey("__match") && cur.get("__match") instanceof List) {
+					curMatchedTypes = (ArrayList<String>)cur.get("__match");
+					if(curMatchedTypes.size() > 0) {
+						cur.put("eventType", (String)curMatchedTypes.get(curMatchedTypes.size()-1));
+					}
+				}
 
 				if(curMatchedTypes.size() == 0) { // we add default type if somehow nothing exists.. this should not acutally happen
 					curMatchedTypes.add("events");
@@ -261,8 +276,15 @@ public class FileInput extends Input<FileInput> implements RepeatableInput, Refe
 				contentLine = readers.get(lowestKey).readLine();
 				if(contentLine != null) {
 					parsed = new HashMap<String, Object>();
-					parsed.putAll(filenameMetadataBuffer.get(readers.get(lowestKey).hashCode()));
-					monitorRuntime.parse(contentLine, parsed, true, this.id);
+					if(filenameMetadataBuffer.containsKey(readers.get(lowestKey).hashCode())) {
+						parsed.putAll(filenameMetadataBuffer.get(readers.get(lowestKey).hashCode()));
+					}
+					
+					if(monitorRuntime != null) {
+						monitorRuntime.parse(contentLine, parsed, true, this.id);
+					} else {
+						parsed.put("data", contentLine);
+					}
 					if(parsed.containsKey("logts_timestamp") && parsed.get("logts_timestamp") instanceof Long) {
 						sortedIndex.put(readers.get(lowestKey).hashCode(), (Long)parsed.get("logts_timestamp"));
 					} else {

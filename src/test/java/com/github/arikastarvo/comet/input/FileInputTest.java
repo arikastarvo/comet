@@ -6,13 +6,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import com.github.arikastarvo.comet.CountingUpdateListener;
+import com.github.arikastarvo.comet.InMemoryInputEventReceiver;
+import com.github.arikastarvo.comet.InMemoryStdOutput;
+import com.github.arikastarvo.comet.MonitorRuntime;
 import com.github.arikastarvo.comet.MonitorRuntimeConfiguration;
 import com.github.arikastarvo.comet.input.file.FileInput;
 import com.github.arikastarvo.comet.input.file.FileInputConfiguration;
+import com.github.arikastarvo.comet.runtime.MonitorRuntimeEsperImpl;
 
 public class FileInputTest {
 
@@ -81,16 +89,78 @@ public class FileInputTest {
 	}
 	
     @Test
-    public void FileInputTest_01() throws Exception {
-		
+    public void FileInputConfigurationURITest() throws Exception {
 		MonitorRuntimeConfiguration runtimeConfiguration = new MonitorRuntimeConfiguration();
 		FileInputConfiguration inputConfiguration = new FileInputConfiguration(runtimeConfiguration);
 		
+		Map<String, Object> conf;
+
+		conf = inputConfiguration.parseURIInputDefinition(new URI("filename.log"));
+		assertTrue(((List<String>)conf.get("file")).contains("filename.log"));
+
+		conf = inputConfiguration.parseURIInputDefinition(new URI("file:filename.log"));
+		assertTrue(((List<String>)conf.get("file")).contains("filename.log"));
+
+		conf = inputConfiguration.parseURIInputDefinition(new URI("file:/filename.log"));
+		assertTrue(((List<String>)conf.get("file")).contains("/filename.log"));
+
+		runtimeConfiguration.sourceConfigurationPath = "/tmp";
+		conf = inputConfiguration.parseURIInputDefinition(new URI("file:filename.log"));
+		assertTrue(((List<String>)conf.get("file")).contains("/tmp/filename.log"));
+	}
+
+    @Test
+    public void FileInputTest_01() throws Exception {
+		
+		MonitorRuntimeConfiguration runtimeConfiguration = new MonitorRuntimeConfiguration();
+		runtimeConfiguration.sourceConfigurationPath = "src/test/resources/";
+		FileInputConfiguration inputConfiguration = new FileInputConfiguration(runtimeConfiguration);
+
 		inputConfiguration.parseMapInputDefinition(new HashMap<String, Object>(){{
 			put("type", "file");
-			put("file", "filename.log");
+			put("file", "one-logevent.log.gz");
 		}});
+		
 		FileInput input = new FileInput(inputConfiguration);
-		assertEquals(input.getClass(), FileInput.class);
+		InMemoryInputEventReceiver inputReceiver = new InMemoryInputEventReceiver();
+		input.setInputEventReceiver(inputReceiver);
+		input.run();
+		assertEquals(1, inputReceiver.data.size());
+		Map<String, Object> lineObj = (Map<String, Object>)inputReceiver.data.get(0); 
+		assertEquals("events", lineObj.get("type"));
+		String data = "2020-04-14T14:11:21+03:00	localhost	1234	data";
+		Map<String, Object> lineObjData = (Map<String, Object>)lineObj.get("data"); 
+		assertEquals(data, lineObjData.get("data"));
+	}
+	
+    @Test
+    public void FileInputTest_02() throws Exception {
+		
+		MonitorRuntimeConfiguration runtimeConfiguration = new MonitorRuntimeConfiguration();
+		runtimeConfiguration.sourceConfigurationPath = "src/test/resources/";
+		FileInputConfiguration inputConfiguration = new FileInputConfiguration(runtimeConfiguration);
+
+		inputConfiguration.parseMapInputDefinition(new HashMap<String, Object>(){{
+			put("type", "file");
+			put("file", "ten-logevent.log.gz");
+		}});
+		
+		FileInput input = new FileInput(inputConfiguration);
+		InMemoryInputEventReceiver inputReceiver = new InMemoryInputEventReceiver();
+		input.setInputEventReceiver(inputReceiver);
+		input.run();
+		assertEquals(10, inputReceiver.data.size());
+
+		Map<String, Object> lineObj = (Map<String, Object>)inputReceiver.data.get(0); 
+		assertEquals("events", lineObj.get("type"));
+		String data = "2020-04-14T14:11:21+03:00	localhost	1234	data";
+		Map<String, Object> lineObjData = (Map<String, Object>)lineObj.get("data"); 
+		assertEquals(data, lineObjData.get("data"));
+
+		lineObj = (Map<String, Object>)inputReceiver.data.get(9); 
+		assertEquals("events", lineObj.get("type"));
+		lineObjData = (Map<String, Object>)lineObj.get("data"); 
+		assertEquals(data, lineObjData.get("data"));
+
 	}
 }

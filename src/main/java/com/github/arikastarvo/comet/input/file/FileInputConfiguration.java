@@ -113,7 +113,7 @@ public class FileInputConfiguration extends InputConfiguration<FileInputConfigur
 		
 		String filename = FileSystem.getPathFromURI(inputDefinition);
 		
-		if(!filename.startsWith("/")) {
+		if(!filename.startsWith("/") && monitorRuntimeConfiguration.sourceConfigurationPath != null) {
 			filename = monitorRuntimeConfiguration.sourceConfigurationPath + File.separator + filename;
 		}
 
